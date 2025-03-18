@@ -1,4 +1,5 @@
 import requests
+import csv
 
 # You should store these configuration values in environment variables or a secure vault.
 GUACAMOLE_API_ENDPOINT = "http://localhost:8080/guacamole/api"
@@ -66,19 +67,85 @@ def delete_connection(token, id):
 def main():
     auth_token = get_auth_token()
 
+    # Get all existing connection groups from the server
     resp = requests.get(
         f"{GUACAMOLE_API_ENDPOINT}/session/data/postgresql/connectionGroups?token={auth_token}"
     )
+    existing_groups = resp.json()
 
-    # Should read all group from guacamole server to build the group tree.
+    # Build a dictionary of existing groups with name as key and identifier as value
+    # The root group has identifier "ROOT"
+    group_dict = {"ROOT": "ROOT"}
+    for group_id, group_info in existing_groups.items():
+        group_dict[group_info["name"]] = group_id
 
-    # read the csv file.
+    # Dictionary to track created groups by their full path
+    created_groups = {}
 
-    # the Site is the groups chain, use slash to separate the groups.
-    # e.g. "DC1/Rack10" is a group named Rack10 under a group named DC1.
-    # and the connection should put the Rack10
+    # Read the CSV file
+    with open("connections.csv", "r") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            # Parse the site (group chain)
+            site_parts = row["site"].split("/")
 
-    # Create the connection in the group.
+            # Start from the root group
+            parent_id = "ROOT"
+            current_path = ""
+
+            # Create or find each group in the chain
+            for i, group_name in enumerate(site_parts):
+                # Build the current path
+                if current_path:
+                    current_path += f"/{group_name}"
+                else:
+                    current_path = group_name
+
+                # Check if this group already exists in our tracking dictionary
+                if current_path in created_groups:
+                    parent_id = created_groups[current_path]
+                    continue
+
+                # Check if this group exists on the server
+                if group_name in group_dict:
+                    # Group exists, use its ID
+                    parent_id = group_dict[group_name]
+                    created_groups[current_path] = parent_id
+                else:
+                    # Group doesn't exist, create it
+                    new_group = create_connection_group(
+                        auth_token, group_name, parent_id
+                    )
+                    parent_id = new_group.get("identifier")
+                    group_dict[group_name] = parent_id
+                    created_groups[current_path] = parent_id
+
+            # Now create the connection in the final group
+            connection_data = {
+                "parentIdentifier": str(parent_id),
+                "name": row["device_name"],
+                "protocol": row["protocol"],
+                "attributes": {
+                    "guacd-hostname": "guacd",
+                    "guacd-port": "4822",
+                    "guacd-encryption": "none",
+                },
+                "parameters": {
+                    "hostname": row["hostname"],
+                    "username": row["username"],
+                    "password": row["password"],
+                    "port": "22",
+                },
+            }
+
+            # Create the connection
+            requests.post(
+                f"{GUACAMOLE_API_ENDPOINT}/session/data/postgresql/connections?token={auth_token}",
+                json=connection_data,
+            )
+            print(f"Created connection: {row['device_name']} in group: {row['site']}")
+
+    print("CSV import completed successfully!")
 
 
 if __name__ == "__main__":
