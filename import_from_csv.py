@@ -2,7 +2,7 @@ import requests
 import csv
 
 # You should store these configuration values in environment variables or a secure vault.
-GUACAMOLE_API_ENDPOINT = "http://localhost:8080/guacamole/api"
+GUACAMOLE_API_ENDPOINT = "http://10.192.4.173/api"
 GUACA_USER = "guacadmin"
 GUACA_PASS = "guacadmin"
 
