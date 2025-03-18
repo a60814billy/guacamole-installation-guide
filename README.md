@@ -3,6 +3,34 @@
 
 *Reference: [Guacamole Docker Documentation](https://guacamole.apache.org/doc/gug/guacamole-docker.html)*
 
+## Architecture Overview
+
+The following diagram illustrates the Guacamole architecture and connection flow:
+
+```mermaid
+graph LR
+    User((User)) -->|HTTP/WS\n80/443| ReverseProxy[Reverse Proxy\n(Apache/Nginx)]
+    ReverseProxy -->|HTTP/WS\n8080| Guacamole[Guacamole Web\nApplication]
+    Guacamole <-->|4822\nGuacamole Protocol| Guacd[Guacd Backend]
+    Guacd -->|SSH 22| NetworkDevices1[Network Devices\nCisco IOS-XR]
+    Guacd -->|SSH 22| NetworkDevices2[Network Devices\nCisco IOS-XE]
+    Guacd -->|SSH 22| NetworkDevices3[Network Devices\nCisco Nexus]
+    Guacd -->|Telnet 23| NetworkDevices4[Other Network\nDevices]
+    Guacd -->|VNC| OtherDevices[Other Remote\nSystems]
+    
+    classDef user fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef proxy fill:#bbf,stroke:#33f,stroke-width:2px;
+    classDef guac fill:#bfb,stroke:#3f3,stroke-width:2px;
+    classDef devices fill:#fbb,stroke:#f33,stroke-width:2px;
+    
+    class User user;
+    class ReverseProxy proxy;
+    class Guacamole,Guacd guac;
+    class NetworkDevices1,NetworkDevices2,NetworkDevices3,NetworkDevices4,OtherDevices devices;
+```
+
+This architecture enables users to access various network devices through a web browser, with all connections securely managed by the Guacamole system.
+
 ## Modifying guacamole-server to Fix "Unable to allocate PTY on Cisco IOS-XR"
 
 1. Clone the guacamole-server repository from GitHub:
