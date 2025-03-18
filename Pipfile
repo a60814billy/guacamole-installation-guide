@@ -6,9 +6,11 @@ name = "pypi"
 [packages]
 requests = "*"
 python-dotenv = "*"
-pytest = "*"
 
 [dev-packages]
+pytest-responses = "*"
+pytest = "*"
+responses = "*"
 
 [requires]
 python_version = "3.12"
