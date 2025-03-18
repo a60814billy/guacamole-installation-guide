@@ -264,3 +264,18 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+
+## Importing Connections from CSV with Tree Structure
+
+When managing connections in Guacamole, you may need to organize them in a hierarchical structure where the same rack name (e.g., "Rack10") might exist in different data centers (e.g., "DC1" and "DC2"). In this case, the full site path (e.g., "DC1/Rack10") is what makes each rack unique, not just the rack name.
+
+The following script (`import_from_csv.py`) allows you to import connections from a CSV file while properly handling this hierarchical structure:
+
+### Tree Structure
+
+The script builds a tree structure where:
+- Each node in the tree represents a connection group
+- The full path to a node (e.g., "DC1/Rack10") is what makes it unique
+- Connections are stored within their respective groups
+
+This approach ensures that even if the same rack name exists in different data centers, they are treated as separate entities based on their full path.
