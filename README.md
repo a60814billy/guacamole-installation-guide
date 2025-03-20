@@ -1,7 +1,10 @@
-
 # Apache Guacamole Installation Guide with Cisco IOS-XR Fix
 
 *Reference: [Guacamole Docker Documentation](https://guacamole.apache.org/doc/gug/guacamole-docker.html)*
+
+## Overview
+
+This guide explains how to install and configure Apache Guacamole using Docker with a patch to fix the "Unable to allocate PTY" issue when connecting to Cisco IOS-XR devices. Additionally, it covers setting up Docker Compose, reverse proxy configuration, user and device management, and API usage.
 
 ## Architecture Overview
 
@@ -31,7 +34,7 @@ graph RL
 
 This architecture enables users to access various network devices through a web browser, with all connections securely managed by the Guacamole system.
 
-## Modifying guacamole-server to Fix "Unable to allocate PTY on Cisco IOS-XR"
+## Fixing "Unable to allocate PTY" issue on Cisco IOS-XR
 
 1. Clone the guacamole-server repository from GitHub:
 ```sh
@@ -155,6 +158,8 @@ If you need to configure SSL, please refer to the Apache or Nginx official docum
 *Reference: [Administration → Managing Sessions](https://guacamole.apache.org/doc/gug/administration.html#managing-sessions)*
 
 ## Using the API to Create Devices and Groups
+
+Check the [unofficial API documentation](https://github.com/ridvanaltun/guacamole-rest-api-documentation) forprogrammatic management of connections and devices.
 
 The following Python script demonstrates how to use the Guacamole API to create connection groups and devices programmatically:
 
