@@ -88,8 +88,6 @@ services:
     restart: unless-stopped
   guacd:
     image: guacd:1.5.5-fix-ios-xr
-    volumes:
-      - ./tty-records:/home/guacd/tty-records
     restart: unless-stopped
   web:
     image: guacamole/guacamole:1.5.5
