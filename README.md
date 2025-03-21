@@ -41,7 +41,12 @@ This architecture enables users to access various network devices through a web 
 git clone https://github.com/apache/guacamole-server
 ```
 
-2. Patch the function `void* ssh_client_thread(void* data);` in the `src/protocols/ssh/ssh.c` file:
+2. Checkout to 1.5.5 branch
+```sh
+git checkout 1.5.5
+```
+
+3. Patch the function `void* ssh_client_thread(void* data);` in the `src/protocols/ssh/ssh.c` file:
 
 ```patch
 diff --git a/src/protocols/ssh/ssh.c b/src/protocols/ssh/ssh.c
@@ -62,9 +67,9 @@ index 7c3ac05c..e7e2685b 100644
      /* Forward specified locale */
 ```
 
-3. Build the Docker image with the patch:
+4. Build the Docker image with the patch:
 ```sh
-docker build -t guacd:1.5.5-fix-ios-xr .
+docker build --build-arg FREERDP_VERSION=2 --build-arg ALPINE_BASE_IMAGE=3.16 -t guacd:1.5.5-fix-ios-xr .
 ```
 
 ## Setting Up Docker Compose
