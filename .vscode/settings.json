@@ -1,7 +1,0 @@
-{
-    "python.testing.pytestArgs": [
-        "guacamole_csv_importer"
-    ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
-}
